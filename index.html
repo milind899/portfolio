@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Milind Shandilya - Portfolio</title>
+    <!-- Custom Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>MS</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <style>
+        :root {
+            --cursor-x: 50vw;
+            --cursor-y: 50vh;
+            /* Default Theme Colors */
+            --bg-color: #020617;
+            --text-color: #e2e8f0;
+            --text-color-light: #a8b2d1;
+            --accent-color: #64ffda;
+            --accent-color-rgb: 100, 255, 218;
+            --glass-bg: rgba(10, 25, 47, 0.5);
+            --glass-border: rgba(100, 255, 218, 0.1);
+            --spotlight-color: rgba(29, 78, 216, 0.15);
+            --aurora-hue1-base: 180;
+            --aurora-hue2-base: 220;
+        }
+        /* Theme Definitions */
+        .theme-matrix {
+            --bg-color: #000000;
+            --text-color: #00ff00;
+            --text-color-light: #00cc00;
+            --accent-color: #00ff00;
+            --accent-color-rgb: 0, 255, 0;
+            --glass-bg: rgba(0, 20, 0, 0.5);
+            --glass-border: rgba(0, 255, 0, 0.2);
+            --spotlight-color: rgba(0, 255, 0, 0.1);
+            --aurora-hue1-base: 120;
+            --aurora-hue2-base: 120;
+        }
+        .theme-solarized {
+            --bg-color: #002b36;
+            --text-color: #839496;
+            --text-color-light: #586e75;
+            --accent-color: #268bd2;
+            --accent-color-rgb: 38, 139, 210;
+            --glass-bg: rgba(7, 54, 66, 0.5);
+            --glass-border: rgba(38, 139, 210, 0.2);
+            --spotlight-color: rgba(131, 148, 150, 0.1);
+            --aurora-hue1-base: 197;
+            --aurora-hue2-base: 207;
+        }
+        .theme-dracula {
+            --bg-color: #282a36;
+            --text-color: #f8f8f2;
+            --text-color-light: #bd93f9;
+            --accent-color: #50fa7b;
+            --accent-color-rgb: 80, 250, 123;
+            --glass-bg: rgba(40, 42, 54, 0.5);
+            --glass-border: rgba(80, 250, 123, 0.2);
+            --spotlight-color: rgba(189, 147, 249, 0.1);
+            --aurora-hue1-base: 265;
+            --aurora-hue2-base: 280;
+        }
+        .theme-cyberpunk {
+            --bg-color: #0c0c1e;
+            --text-color: #f5f5f5;
+            --text-color-light: #9ca3af;
+            --accent-color: #f72585; /* Neon Pink */
+            --accent-color-rgb: 247, 37, 133;
+            --glass-bg: rgba(72, 22, 128, 0.3); /* Purple Glass */
+            --glass-border: rgba(247, 37, 133, 0.3);
+            --spotlight-color: rgba(247, 37, 133, 0.1);
+            --aurora-hue1-base: 280;
+            --aurora-hue2-base: 320;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            cursor: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, background-color 0.5s ease, color 0.5s ease;
+            overflow-x: hidden;
+        }
+        body.loaded {
+            opacity: 1;
+        }
+        .preloader {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .preloader.hidden { opacity: 0; visibility: hidden; }
+        .loader {
+            border: 4px solid rgba(100, 255, 218, 0.2);
+            border-left-color: var(--accent-color);
+            border-radius: 50%;
+            width: 50px; height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #aurora-canvas {
+            position: fixed;
+            width: 100%; height: 100%;
+            top: 0; left: 0;
+            z-index: -2; opacity: 0.6;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; pointer-events: none;
+            background: radial-gradient(
+                circle 400px at var(--cursor-x) var(--cursor-y),
+                var(--spotlight-color),
+                transparent 80%
+            );
+            transition: background 0.1s ease-out;
+        }
+
+        .section {
+            min-height: 100vh;
+            display: flex; flex-direction: column; justify-content: center;
+            padding-top: 4rem; padding-bottom: 4rem;
+            width: 100%;
+        }
+        .text-cyan { color: var(--accent-color); }
+        
+        .btn-primary {
+            position: relative;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            border-radius: 0.375rem;
+            padding: 0.75rem 1.5rem;
+            font-family: 'Inter', sans-serif;
+            transition: color 0.4s ease;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .btn-primary .btn-text {
+            position: relative;
+            z-index: 2;
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background-color: var(--accent-color);
+            transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 1;
+        }
+        .btn-primary:hover {
+            color: var(--bg-color);
+        }
+        .btn-primary:hover::before {
+            width: 100%;
+        }
+
+        .clickable-zoom { transition: transform 0.2s ease-out; }
+        .clickable-zoom:hover { transform: scale(1.1); }
+
+        .cursor-dot, .cursor-follower {
+            position: fixed;
+            top: 0; left: 0; border-radius: 50%;
+            z-index: 9999; pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
+        .cursor-dot { width: 8px; height: 8px; background-color: var(--accent-color); }
+        .cursor-follower {
+            width: 40px; height: 40px;
+            background-color: rgba(var(--accent-color-rgb), 0.1);
+            border: 1px solid rgba(var(--accent-color-rgb), 0.2);
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
+        body.cursor-hover .cursor-follower {
+            transform: translate(-50%, -50%) scale(1.6);
+            background-color: rgba(var(--accent-color-rgb), 0.2);
+        }
+        @media (max-width: 768px) {
+            body { cursor: auto; }
+            .cursor-dot, .cursor-follower { display: none; }
+        }
+        .typed-cursor { color: var(--accent-color); }
+
+        header {
+            position: fixed; top: 0; left: 0; right: 0;
+            z-index: 50;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            animation: fadeInDown 0.5s 0.5s ease-out forwards;
+            opacity: 0; transform: translateY(-20px);
+        }
+        @keyframes fadeInDown { to { opacity: 1; transform: translateY(0); } }
+
+        .social-links {
+            position: fixed; bottom: 0; left: 2.5rem;
+            display: none; z-index: 50;
+        }
+        @media (min-width: 1024px) { .social-links { left: 4rem; } }
+        @media (min-width: 768px) { .social-links { display: block; } }
+        .social-links ul { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+        .social-links::after {
+            content: ''; display: block;
+            width: 1px; height: 90px;
+            margin: 0 auto;
+            background-color: var(--text-color-light);
+        }
+        .social-links a { color: var(--text-color-light); }
+        
+        .heading-gradient {
+            background: linear-gradient(90deg, var(--text-color), var(--text-color-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .project-card-glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer; position: relative; overflow: hidden;
+        }
+
+        .project-card-glass:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .project-card-glass::after {
+            content: ""; position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(
+                circle 200px at var(--cursor-x-card) var(--cursor-y-card),
+                rgba(var(--accent-color-rgb), 0.15),
+                transparent 80%
+            );
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .project-card-glass:hover::after { opacity: 1; }
+        
+        .keyword { transition: all 0.2s ease-in-out; display: inline-block; }
+        .keyword:hover { transform: scale(1.1); color: var(--accent-color); }
+        
+        .magnetic-button { display: inline-block; transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        
+        .text-shadow-hero { text-shadow: 0px 4px 20px rgba(0,0,0,0.5); }
+        
+        #theme-toast {
+            position: fixed; bottom: 2rem; left: 50%;
+            transform: translateX(-50%);
+            padding: 0.75rem 1.5rem;
+            background-color: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color);
+            border-radius: 0.5rem;
+            font-family: 'Inter', sans-serif;
+            z-index: 10001;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s, visibility 0.5s, background-color 0.5s, border-color 0.5s, color 0.5s;
+        }
+        #theme-toast.show { opacity: 1; visibility: visible; }
+        
+        .easter-egg-hint {
+            position: relative;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="preloader"><div class="loader"></div></div>
+    <canvas id="aurora-canvas"></canvas>
+    <div class="cursor-dot"></div>
+    <div class="cursor-follower"></div>
+    <div id="theme-toast">Theme changed!</div>
+
+    <header>
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#home" id="logo" class="text-2xl font-bold text-cyan clickable-zoom">MS</a>
+            <div class="hidden md:flex items-center space-x-6 font-mono">
+                <a href="#about" class="hover:text-cyan transition-colors clickable-zoom">About</a>
+                <a href="#skills" class="hover:text-cyan transition-colors clickable-zoom">Skills</a>
+                <a href="#project" class="hover:text-cyan transition-colors clickable-zoom">Project</a>
+                <a href="#contact" class="hover:text-cyan transition-colors clickable-zoom">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <aside class="social-links">
+        <ul>
+            <li><a href="https://github.com/milind899" target="_blank" class="hover:text-cyan block transition-all clickable-zoom"><i data-lucide="github" class="w-6 h-6"></i></a></li>
+            <li><a href="https://www.linkedin.com/in/milind899/" target="_blank" class="hover:text-cyan block transition-all clickable-zoom"><i data-lucide="linkedin" class="w-6 h-6"></i></a></li>
+            <li><a href="https://x.com/Milind899" target="_blank" class="hover:text-cyan block transition-all clickable-zoom"><i data-lucide="twitter" class="w-6 h-6"></i></a></li>
+        </ul>
+    </aside>
+
+    <main class="w-full flex flex-col items-center px-6 sm:px-12 md:px-24 relative z-10">
+
+        <section id="home" class="section max-w-5xl">
+            <div data-aos="fade-up">
+                <h1 class="text-shadow-hero text-4xl sm:text-6xl lg:text-7xl font-bold text-slate-100 mt-4 h-36 sm:h-48">I am <span class="text-cyan" id="typed-text"></span></h1>
+                <p class="text-shadow-hero mt-6 max-w-xl text-lg text-slate-300">
+                    I'm a developer and a third-year B.Tech CSE student at SRMIST, specializing in AI and Machine Learning. I have a passion for creating intelligent, scalable solutions to complex problems.
+                </p>
+                <a href="#project" class="btn-primary inline-block mt-8 clickable-zoom"><span class="btn-text">Check out my featured project!</span></a>
+            </div>
+        </section>
+
+        <section id="about" class="section max-w-5xl">
+             <div class="w-full" data-aos="fade-up">
+                <h2 class="text-3xl font-bold mb-12 flex items-center">
+                    <span class="text-cyan font-mono mr-3">01.</span> <span class="heading-gradient">About Me</span>
+                </h2>
+                <div class="grid md:grid-cols-2 gap-12 items-start">
+                     <div class="space-y-4 text-slate-300 text-lg">
+                         <p>
+                            My journey in tech is driven by a fascination with <span class="keyword">artificial intelligence</span> and its potential to solve real-world challenges. From my first "Hello, World!" program to developing complex <span class="keyword">machine learning models</span>, my passion has always been about turning innovative ideas into tangible, intelligent applications.
+                        </p>
+                        <p>
+                            I thrive on the challenges of <span class="keyword">algorithm design</span> and data structures, and I'm dedicated to building software that is not only functional but also efficient and scalable. I am constantly learning and exploring the frontiers of AI, eager to contribute to projects that push the boundaries of technology.
+                        </p>
+                    </div>
+                    <div class="space-y-4 font-mono text-slate-300">
+                        <h3 class="font-bold text-slate-100 mb-2">Things I'm Passionate About:</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-center"><i data-lucide="footprints" class="w-5 h-5 mr-3 text-cyan"></i><span>Coding</span></li>
+                            <li class="flex items-center"><i data-lucide="puzzle" class="w-5 h-5 mr-3 text-cyan"></i><span>Complex Problem Solving</span></li>
+                            <li class="flex items-center"><i data-lucide="code" class="w-5 h-5 mr-3 text-cyan"></i><span>Clean & Efficient Code</span></li>
+                             <li class="flex items-center"><i data-lucide="book-open" class="w-5 h-5 mr-3 text-cyan"></i><span>Continuous Learning</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="section max-w-5xl">
+            <div class="w-full" data-aos="fade-up">
+                <h2 class="text-3xl font-bold mb-12 flex items-center">
+                     <span class="text-cyan font-mono mr-3">02.</span> <span class="heading-gradient">My Skills</span>
+                </h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div data-aos="fade-up" data-aos-delay="100">
+                        <h3 class="text-xl font-bold text-slate-200 mb-4">Languages & Core Concepts</h3>
+                        <ul class="space-y-2 font-mono text-slate-300">
+                            <li class="flex items-center"><i data-lucide="chevron-right" class="w-4 h-4 mr-2 text-cyan"></i>Python</li>
+                            <li class="flex items-center"><i data-lucide="chevron-right" class="w-4 h-4 mr-2 text-cyan"></i>C++</li>
+                            <li class="flex items-center"><i data-lucide="chevron-right" class="w-4 h-4 mr-2 text-cyan"></i>Data Structures & Algos</li>
+                            <li class="flex items-center"><i data-lucide="chevron-right" class="w-4 h-4 mr-2 text-cyan"></i>Object-Oriented Programming</li>
+                        </ul>
+                    </div>
+                     <div data-aos="fade-up" data-aos-delay="200">
+                        <h3 class="text-xl font-bold text-slate-200 mb-4">Frameworks & Libraries</h3>
+                        <ul class="space-y-2 font-mono text-slate-300">
+                            <li class="flex items-center"><i data-lucide="chevron-right" class="w-4 h-4 mr-2 text-cyan"></i>TensorFlow</li>
+                            <li class="flex items-center"><i data-lucide="chevron-right" class="w-4 h-4 mr-2 text-cyan"></i>PyTorch</li>
+                            <li class="flex items-center"><i data-lucide="chevron-right" class="w-4 h-4 mr-2 text-cyan"></i>LangChain</li>
+                             <li class="flex items-center"><i data-lucide="chevron-right" class="w-4 h-4 mr-2 text-cyan"></i>Scikit-learn</li>
+                        </ul>
+                    </div>
+                     <div data-aos="fade-up" data-aos-delay="300">
+                        <h3 class="text-xl font-bold text-slate-200 mb-4">Tools & Platforms</h3>
+                        <ul class="space-y-2 font-mono text-slate-300">
+                            <li class="flex items-center"><i data-lucide="chevron-right" class="w-4 h-4 mr-2 text-cyan"></i>Git & GitHub</li>
+                            <li class="flex items-center"><i data-lucide="chevron-right" class="w-4 h-4 mr-2 text-cyan"></i>Docker</li>
+                            <li class="flex items-center"><i data-lucide="chevron-right" class="w-4 h-4 mr-2 text-cyan"></i>Jupyter Notebooks</li>
+                             <li class="flex items-center"><i data-lucide="chevron-right" class="w-4 h-4 mr-2 text-cyan"></i>VS Code</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="project" class="section max-w-5xl">
+             <div class="w-full" data-aos="fade-up">
+                 <h2 class="text-3xl font-bold mb-12 flex items-center">
+                    <span class="text-cyan font-mono mr-3">03.</span> <span class="heading-gradient">Featured Project</span>
+                </h2>
+                <div>
+                    <a id="project-card" href="https://github.com/milind899/Advanced-RAG-Chatbot" target="_blank" class="project-card-glass block p-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <i data-lucide="folder" class="w-10 h-10 text-cyan"></i>
+                            <div class="hover:text-cyan transition-colors z-10 relative">
+                                <i data-lucide="github" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-100 mb-2 hover:text-cyan transition-colors duration-300">Advanced RAG Chatbot</h3>
+                        <p class="text-slate-400">
+                            A sophisticated chatbot using Retrieval-Augmented Generation (RAG) to provide accurate answers from a custom knowledge base. It leverages advanced NLP techniques to understand and respond to user queries effectively.
+                        </p>
+                        <footer class="mt-6 flex flex-wrap gap-4 font-mono text-sm text-slate-400">
+                            <span>LangChain</span>
+                            <span>LLMs</span>
+                            <span>Streamlit</span>
+                            <span>ChromaDB</span>
+                        </footer>
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <section id="contact" class="section max-w-5xl text-center">
+             <div class="max-w-xl mx-auto" data-aos="fade-up">
+                <h2 class="font-mono text-cyan mb-2">04. What's Next?</h2>
+                <h3 class="text-5xl font-bold mb-4 text-slate-100"><span class="heading-gradient">My Journey Continues</span></h3>
+                <p class="text-slate-400 mb-8">
+                    I am passionate about leveraging my skills in a challenging environment and am actively seeking opportunities where I can contribute to meaningful projects. If you have a role that aligns with my expertise, I'd be excited to connect.
+                </p>
+                <div class="magnetic-button">
+                    <a href="#" class="btn-primary text-xl clickable-zoom"><span class="btn-text">View My Resume</span></a>
+                </div>
+             </div>
+        </section>
+
+    </main>
+    
+    <footer class="text-center py-8 relative z-10">
+        <div class="font-mono text-slate-500 text-sm flex justify-center items-center gap-4">
+            <span>Designed & Built by Milind Shandilya</span>
+            <button id="theme-changer" class="easter-egg-hint transition-colors hover:text-cyan">
+                <i data-lucide="palette" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const preloader = document.querySelector('.preloader');
+            setTimeout(() => {
+                preloader.classList.add('hidden');
+                document.body.classList.add('loaded');
+            }, 500);
+
+            lucide.createIcons();
+            AOS.init({
+                duration: 800,
+                once: true,
+                offset: 100,
+            });
+
+            const root = document.documentElement;
+            const cursorDot = document.querySelector('.cursor-dot');
+            const cursorFollower = document.querySelector('.cursor-follower');
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+            let followerX = mouseX;
+            let followerY = mouseY;
+            
+            document.addEventListener('mousemove', e => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                root.style.setProperty('--cursor-x', e.clientX + "px");
+                root.style.setProperty('--cursor-y', e.clientY + "px");
+            });
+
+            function animateCursor() {
+                followerX += (mouseX - followerX) * 0.1;
+                followerY += (mouseY - followerY) * 0.1;
+                cursorDot.style.left = mouseX + 'px';
+                cursorDot.style.top = mouseY + 'px';
+                cursorFollower.style.left = followerX + 'px';
+                cursorFollower.style.top = followerY + 'px';
+                requestAnimationFrame(animateCursor);
+            }
+            animateCursor();
+
+            const interactiveElements = document.querySelectorAll('a, button, .keyword');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseover', () => document.body.classList.add('cursor-hover'));
+                el.addEventListener('mouseout', () => document.body.classList.remove('cursor-hover'));
+            });
+            
+            new Typed('#typed-text', {
+                strings: ['Milind Shandilya.', 'a Developer.', 'an AI Enthusiast.'],
+                typeSpeed: 50, backSpeed: 30, loop: true, backDelay: 2000,
+            });
+
+            const projectCard = document.getElementById('project-card');
+            if (projectCard) {
+                projectCard.addEventListener('mousemove', e => {
+                    const rect = projectCard.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    projectCard.style.setProperty('--cursor-x-card', x + 'px');
+                    projectCard.style.setProperty('--cursor-y-card', y + 'px');
+                });
+            }
+            
+            const magneticButton = document.querySelector('.magnetic-button');
+            if (magneticButton) {
+                const btn = magneticButton.querySelector('a');
+                const strength = 30;
+                 const handleMagneticMove = (e) => {
+                    const rect = magneticButton.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    btn.style.transform = `translate(${x / strength}px, ${y / strength}px)`;
+                };
+                const handleMagneticLeave = () => {
+                    btn.style.transform = 'translate(0, 0)';
+                };
+                magneticButton.addEventListener('mousemove', handleMagneticMove);
+                magneticButton.addEventListener('mouseleave', handleMagneticLeave);
+            }
+
+            const canvas = document.getElementById('aurora-canvas');
+            const ctx = canvas.getContext('2d');
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+            let time = 0;
+            let auroraX = width / 2;
+            let auroraY = height / 2;
+
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            });
+
+            function draw() {
+                ctx.clearRect(0, 0, width, height);
+                time += 0.005;
+                
+                auroraX += (mouseX - auroraX) * 0.03;
+                auroraY += (mouseY - auroraY) * 0.03;
+
+                const styles = getComputedStyle(document.body);
+                const hue1Base = parseFloat(styles.getPropertyValue('--aurora-hue1-base'));
+                const hue2Base = parseFloat(styles.getPropertyValue('--aurora-hue2-base'));
+
+                for (let i = 0; i < 40; i++) {
+                    ctx.beginPath();
+                    const x = Math.sin(time + i * 0.2) * (width / 4) + auroraX;
+                    const y = Math.cos(time + i * 0.25) * (height / 4) + auroraY;
+                    const r = Math.sin(time + i * 0.1) * 150 + 150;
+
+                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
+                    const hue1 = hue1Base + Math.sin(time + i * 0.1) * 30;
+                    const hue2 = hue2Base + Math.cos(time + i * 0.15) * 30;
+                    gradient.addColorStop(0, `hsla(${hue1}, 50%, 50%, 0.1)`);
+                    gradient.addColorStop(1, `hsla(${hue2}, 60%, 50%, 0)`);
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, width, height);
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
+            
+            const themes = ['default', 'matrix', 'solarized', 'dracula', 'cyberpunk'];
+            let currentThemeIndex = 0;
+            
+            function changeTheme() {
+                currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+                const nextTheme = themes[currentThemeIndex];
+                
+                document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
+
+                if (nextTheme !== 'default') {
+                    document.body.classList.add(`theme-${nextTheme}`);
+                }
+                
+                const toast = document.getElementById('theme-toast');
+                toast.textContent = `Theme: ${nextTheme.charAt(0).toUpperCase() + nextTheme.slice(1)}`;
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2000);
+            }
+
+            // Keyboard trigger
+            let keySequence = '';
+            const triggerWord = 'theme';
+            document.addEventListener('keydown', (e) => {
+                keySequence += e.key.toLowerCase();
+                if (keySequence.length > triggerWord.length) {
+                    keySequence = keySequence.slice(-triggerWord.length);
+                }
+                if (keySequence === triggerWord) {
+                    changeTheme();
+                    keySequence = '';
+                }
+            });
+            
+            // Icon trigger
+            document.getElementById('theme-changer').addEventListener('click', changeTheme);
+        });
+    </script>
+</body>
+</html>
